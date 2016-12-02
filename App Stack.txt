@@ -1,0 +1,15 @@
+Assignment 3: 
+ 
+Considering a three-tier app (web server, app server and database).
+[ Apache Web server -> Tomcat app server -> database ]
+How would you build an app stack (leave out the database) that has no single point of failure and is fault-tolerant?
+Explicitly state the assumptions you are making, if any.
+
+The App Server as well as the Web Server Infrastructure should be configured in an Active and Passive manner and should be configured to use a DNS configuration to advertise multiple IP addresses using a Load Balancing hardware solution for this -- e.g. F5's BigIP devices.
+DNS based Global Server Load Balancing (GSLB) should be used in this scenario the solution is expected to also (simultaneously) enhance (or at least not damage!) high availability.
+it will generally use one of the other addresses if the one it's using becomes unavailable. The DNS servers have to continually monitor all of the sites and stop advertising any that go down. They also need very short TTLs. There are hardware solutions for this -- e.g. F5's BigIP devices. use load-balancer (from F5 networks). Have one IP address and the load-balancer forwards the connections to any of a number of web-servers behind it.
+
+You'll also need ways to replicate your database using Oracle Golden Gate , your files, and your users' session states between the datacentres in realtime.
+Application session-state is something that needs to be handled by the web-app, though. Once a person connects to the service, do they stay connected to the same actual server (i.e. session state is server-specific) or do they connect to any number of servers (i.e. session state is available to all servers, through a database or something). If state is not preserved across nodes, then when a server bounces the users attached to that server will have to re-establish state.
+
+There's something called Network Load Balancing and VIP = Virtual IP. You create one VIP for 3 webservers and traffic goes to the working one. This of course depends on many factors but in Windows and IIS it's quite easy to enable NLB on multiple IIS servers so if one goes down the others are serving content.
